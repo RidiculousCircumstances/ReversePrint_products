@@ -1,0 +1,44 @@
+version: '3.3'
+
+services:
+
+  nginx:
+
+    build:
+      context: ./
+      dockerfile: docker/nginx/nginx.docker
+    volumes:
+      - ./:/var/www
+      - ./docker/nginx/ssl:/etc/nginx/ssl
+    ports:
+      - "8080:443"
+    links:
+      - php-fpm
+
+  php-fpm:
+
+    build:
+      context: ./
+      dockerfile: docker/php/php-fpm.docker
+    volumes:
+      - ./:/var/www
+    environment:
+      DB_HOST: host.docker.internal
+
+  php-cli:
+    build:
+      context: ./
+      dockerfile: docker/php/php-cli.docker
+    volumes:
+      - ./:/var/www
+      - ./docker/php/zzz-xdebug.ini:/usr/local/etc/php/conf.d/zzz-xdebug.ini
+    ports:
+      - "8000:8000"
+    environment:
+      XDEBUG_CONFIG: discover_client_host=true client_host=host.docker.internal log_level=0
+      DB_HOST: host.docker.internal
+    tty: true
+    command: php -S 0.0.0.0:8000 -t /var/www/public /var/www/public/index.php && chmod 777 -R /var/www/storage/app/images
+
+
+
