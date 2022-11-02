@@ -3,22 +3,26 @@
 namespace App\Product;
 
 use App\Http\Controllers\Controller;
-use App\Product\DTO\ProductInstanceDTO;
 use App\Product\Requests\ProductCreateRequest;
+use App\Product\Requests\ProductUpdateRequest;
 use Illuminate\Http\Request;
+use App\Product\DTO\ProductInstanceDTO;
+
 
 class ProductController extends Controller
 {
-    public function __construct(private readonly ProductService $productService)
-    {
-    }
+    public function __construct(private readonly ProductService $productService){}
 
-    public function create(ProductCreateRequest $req): array
+    public function create(Request $req): array
     {
-        $req['productPathASide'] = $req->file('sideA')->store('images');
-        $req['productPathBSide'] = $req->file('sideB')->store('images');
+        if (!$req->file('sideA') || !$req->file('sideB')) {
+            return abort(422, 'Image must be specified');
+        }
+        $dto = ProductInstanceDTO::from($req->data);
+        $dto->product->path_to_a_side = $req->file('sideA')->store('images');
+        $dto->product->path_to_b_side = $req->file('sideB')->store('images');
 
-        return $this->productService->createProduct(ProductInstanceDTO::fromRequest($req));
+        return $this->productService->createProduct($dto);
     }
 
     public function get(): array
@@ -33,6 +37,19 @@ class ProductController extends Controller
 
     public function delete(Request $req)
     {
-        return $this->productService->delete($req->route('id'));
+        $result = $this->productService->delete($req->route('id'));
+        $result ? response(200) : abort(404);
+    }
+
+    public function update(ProductUpdateRequest $req) {
+
+        $req['productPathASide'] = $req->file('sideA')?->store('images');
+        $req['productPathBSide'] = $req->file('sideB')?->store('images');
+
+        $m = $req->toArray();
+        $a = ProductInstanceDTO::from($m);
+
+        $this->productService->update(ProductInstanceDTO::from($req), $req->route('id'));
+
     }
 }
