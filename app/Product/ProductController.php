@@ -7,7 +7,18 @@ use App\Product\Requests\ProductCreateRequest;
 use App\Product\Requests\ProductUpdateRequest;
 use Illuminate\Http\Request;
 use App\Product\DTO\ProductInstanceDTO;
+use PhpParser\Node\Expr\Cast\Object_;
+use Spatie\LaravelData\Attributes\Validation\Numeric;
+use Spatie\LaravelData\Attributes\Validation\Size;
+use Spatie\LaravelData\Data;
+use Spatie\LaravelData\Optional;
+use stdClass;
 
+
+class Dto extends Data {
+    #[Size(9)]
+    public int $test;
+}
 
 class ProductController extends Controller
 {
@@ -15,10 +26,24 @@ class ProductController extends Controller
 
     public function create(Request $req): array
     {
+
+
         if (!$req->file('sideA') || !$req->file('sideB')) {
             return abort(422, 'Image must be specified');
         }
-        $dto = ProductInstanceDTO::from($req->data);
+
+        $plain = $req->data;
+        $json = json_decode($plain);
+        foreach ($json as $key => $value) {
+            if(gettype($value) === "object") {
+                foreach ($value as $nestedkey => $nestedvalue) {
+                    $req[$key] = $req[$key] ? $req[$key] + [$nk => $nv] : [$nk => $nv];
+                }
+            } else {
+                $req[$key] = $value;
+            }
+        }
+        $dto = ProductInstanceDTO::from($req);
         $dto->product->path_to_a_side = $req->file('sideA')->store('images');
         $dto->product->path_to_b_side = $req->file('sideB')->store('images');
 
@@ -50,6 +75,16 @@ class ProductController extends Controller
         $a = ProductInstanceDTO::from($m);
 
         $this->productService->update(ProductInstanceDTO::from($req), $req->route('id'));
+    }
 
+    public function test(Request $req) {
+        $req['s1'] = ['s2' => 'sssd'];
+
+        $plain = $req->data;
+        $json = json_decode($plain);
+        foreach ($json as $key => $value) {
+            $req[$key] = $value;
+        }
+        $result = Dto::from($req);
     }
 }
