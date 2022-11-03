@@ -31,8 +31,8 @@ return new class extends Migration
             $table->string('name', 32)->unique();
             $table->string('description', 500)->nullable();
             $table->float('price');
-            $table->string('path_to_a_side', 100);
-            $table->string('path_to_b_side', 100);
+            $table->string('a_side', 100)->nullable();
+            $table->string('b_side', 100)->nullable();
             $table->enum('sex', ['male', 'female', 'uni'])->default('uni');
             $table->timestamps();
         });
@@ -58,9 +58,10 @@ return new class extends Migration
      */
     public function down()
     {
+        Schema::drop('product_instances');
         Schema::drop('colors');
         Schema::drop('sizes');
         Schema::drop('products');
-        Schema::drop('product_instances');
+
     }
 };

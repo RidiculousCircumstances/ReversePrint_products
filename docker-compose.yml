@@ -16,7 +16,6 @@ services:
       - php-fpm
 
   php-fpm:
-
     build:
       context: ./
       dockerfile: docker/php/php-fpm.docker
@@ -24,6 +23,7 @@ services:
       - ./:/var/www
     environment:
       DB_HOST: host.docker.internal
+#    command: chmod 777 -R /var/www/storage/app/images
 
   php-cli:
     build:
