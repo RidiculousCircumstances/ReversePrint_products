@@ -39,12 +39,12 @@ return new class extends Migration
 
         Schema::create('product_instances', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('color_id');
-            $table->unsignedBigInteger('size_id');
-            $table->unsignedBigInteger('product_id');
-            $table->foreign('color_id')->references('id')->on('colors');
-            $table->foreign('size_id')->references('id')->on('sizes');
-            $table->foreign('product_id')->references('id')->on('products');
+            $table->unsignedBigInteger('color_id')->nullable();
+            $table->unsignedBigInteger('size_id')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
+            $table->foreign('color_id')->references('id')->on('colors')->onDelete('set null');
+            $table->foreign('size_id')->references('id')->on('sizes')->onDelete('set null');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('set null');
             $table->string('article')->unique();
             $table->integer('stock_balance');
             $table->timestamps();

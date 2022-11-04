@@ -22,10 +22,8 @@ enum Sex: string
 
 class ProductDTO extends Data
 {
-
-
     public function __construct(
-        public int $id,
+        public ?int $id,
         public string $name,
 
         #[Max(500)]

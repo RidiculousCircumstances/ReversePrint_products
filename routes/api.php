@@ -28,7 +28,7 @@ Route::prefix('product')->group(function () {
     /**
      * Create size
      */
-    Route::post('/color', [ProductController::class, 'createSize']);
+    Route::post('/size', [ProductController::class, 'createSize']);
 
     /**
      * get all products
@@ -46,7 +46,6 @@ Route::prefix('product')->group(function () {
     Route::get('/size', [ProductController::class, 'getSizes']);
 
 
-
     /**
      * Get all products
      */
@@ -57,15 +56,15 @@ Route::prefix('product')->group(function () {
      */
     Route::get('/{id}', [ProductController::class, 'getInstance']);
 
-    /**
-     * Delete product by id
-     */
+
     Route::delete('/{id}', [ProductController::class, 'deleteInstance']);
 
-    /**
-     * ??? Incorrect
-     */
-    Route::put('/{id}', [ProductController::class, 'update']);
+    Route::delete('/color/{id}', [ProductController::class, 'deleteColor']);
+
+    Route::delete('/product/{id}', [ProductController::class, 'deleteProduct']);
+
+    Route::delete('/size/{id}', [ProductController::class, 'deleteSize']);
+
 });
 
 Route::post('/', [ProductController::class, 'test']);
