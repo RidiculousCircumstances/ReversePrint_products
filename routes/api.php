@@ -4,6 +4,8 @@ use App\Product\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('product')->group(function () {
+
+    /***************************************POST*************************************/
     /**
      * Create product by one request
      */
@@ -12,50 +14,42 @@ Route::prefix('product')->group(function () {
     /**
      * Create product by parts
      */
-    Route::post('/partial', [ProductController::class, 'createInstancePartial']);
+    Route::post('/', [ProductController::class, 'createInstancePartial']);
 
     /**
      * Create product
      */
     Route::post('/product', [ProductController::class, 'createProduct']);
-    Route::post('/product/load', [ProductController::class, 'loadProductPics']);
 
     /**
-     * Create color
+     * Load product's image
      */
+    Route::post('/product/upload', [ProductController::class, 'loadProductPics']);
+
     Route::post('/color', [ProductController::class, 'createColor']);
 
-    /**
-     * Create size
-     */
     Route::post('/size', [ProductController::class, 'createSize']);
 
-    /**
-     * get all products
-     */
+
+    /*********************************GET***************************************/
+
     Route::get('/product', [ProductController::class, 'getProducts']);
 
-    /**
-     * get all colors
-     */
     Route::get('/color', [ProductController::class, 'getColors']);
 
-    /**
-     * get all sizes
-     */
     Route::get('/size', [ProductController::class, 'getSizes']);
 
-
-    /**
-     * Get all products
-     */
     Route::get('/', [ProductController::class, 'getInstances']);
 
-    /**
-     * Get product by id
-     */
     Route::get('/{id}', [ProductController::class, 'getInstance']);
 
+    /***********************************UPDATE***********************************/
+
+    Route::put('/{id}', [ProductController::class, 'updateInstance']);
+
+    Route::put('/product/{id}', [ProductController::class, 'updateProduct']);
+
+    /*************************************DELETE********************************/
 
     Route::delete('/{id}', [ProductController::class, 'deleteInstance']);
 
@@ -66,5 +60,3 @@ Route::prefix('product')->group(function () {
     Route::delete('/size/{id}', [ProductController::class, 'deleteSize']);
 
 });
-
-Route::post('/', [ProductController::class, 'test']);

@@ -7,6 +7,8 @@ use App\Product\DTO\ColorDTO;
 use App\Product\DTO\PicsDTO;
 use App\Product\DTO\ProductDTO;
 use App\Product\DTO\ProductInstancePartialDTO;
+use App\Product\DTO\ProductInstanceUpdateDTO;
+use App\Product\DTO\ProductUpdateDTO;
 use App\Product\DTO\SizeDTO;
 use App\Product\Models\Color;
 use App\Product\Models\ProductInstance;
@@ -79,9 +81,7 @@ class ProductService
     {
         return SizeDTO::from(Size::firstOrCreate(['value' => $dto->value], $dto->toArray()));
     }
-
-
-
+    
     public function getProducts (): DataCollection
     {
         return ProductDTO::collection(Product::get());
@@ -106,6 +106,28 @@ class ProductService
     public function getInstance (string $id): array
     {
         return ProductInstance::with(['color', 'size', 'product'])->find($id)->toArray();
+    }
+
+    public function updateInstance (ProductInstanceUpdateDTO $dto, string $id): ProductInstanceWholeDTO|null
+    {
+        $model = ProductInstance::find($id);
+        if (is_null($model)) {
+            return $model;
+        }
+        $model->update($dto->toArray());
+        $model->load(['color', 'size', 'product']);
+        return ProductInstanceWholeDTO::from($model);
+    }
+
+    public function updateProduct (ProductUpdateDTO $dto, string $id): ProductDTO|null
+    {
+        $model = Product::find($id);
+        if (is_null($model)) {
+            return $model;
+        }
+        $model->update($dto->toArray());
+        return ProductDTO::from($model);
+
     }
 
     public function deleteInstance (string $id): bool

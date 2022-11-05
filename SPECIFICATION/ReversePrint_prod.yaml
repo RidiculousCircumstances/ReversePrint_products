@@ -1,0 +1,489 @@
+openapi: 3.0.3
+info:
+  title: ReversePrint_prod openAPI specification
+  description: CRUD operations with product instance.
+  version: 1.0.0
+servers:
+  - url: 'https://localhost:8080/api'
+
+
+paths:
+  /product/whole:
+    post:
+      summary: Product instance creating.
+      description: >
+        Single-Query Product Instance Creation. Creates size, color, product and instance-specific properties. Sends images also.
+      tags:
+        - Product
+      requestBody:
+        description: The data and images are sent as a single FormData object. Json must be serialized in the "Data" field.
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                data:
+                  $ref: '#/components/schemas/CreatingWholeInstance'
+                sideA:
+                  type: string
+                  format: binary
+                sideB:
+                  type: string
+                  format: binary
+      responses:
+        201:
+          description: Represents created instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedInstance'
+        422:
+          description: Incorrect data sent
+
+
+  /product:
+    post:
+      summary: Product instance creating.
+      description: >
+        Creates a product instance with a choice of existing entities. 
+        Entities are created separately. Images are sent separately also.
+      tags:
+        - Product
+      requestBody:
+        description: Entity ids and instance-specific data should be sent here.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatingInstance'
+      responses:
+        201:
+          description: Json object of successfully created instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedInstance'
+        422:
+          description: Incorrect data sent.
+    get:
+      summary: Represents product instances.
+      description: >
+        This resource represents all existing product instances.
+      tags:
+        - Product
+      responses:
+        200:
+          description: Array of json objects.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreatedInstance'
+
+
+  /product/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The product instance id
+        required: true
+        schema:
+          type: integer
+    get:
+      summary: Represents product instance.
+      tags:
+        - Product
+      description: >
+        This resource represents concrete product instance by its id with its relations.
+      responses:
+        201:
+          description: Json object of successfully found instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedInstance'
+        404:
+          description: Not found exception.
+
+    put:
+      summary: Updates product instance.
+      tags:
+        - Product
+      description: >
+        This resource allows you to update existing product instance by one of or few its fields.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - $ref: '#/components/schemas/CreatingInstance'
+      responses:
+        201:
+          description: >
+            Json object of successfully updated instance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedInstance'
+        404:
+          description: Instance not found
+        422:
+          description: Incorrect data sent.
+
+    delete:
+      summary: Deletes product instance.
+      tags:
+        - Product
+      description: >
+        Deletes product instance by id.
+
+      responses:
+        200:
+          description: Successful deleting.
+        404:
+          description: Instance not found.
+
+
+  /product/product:
+    post:
+      summary: Product Creation..
+      tags:
+        - Product
+      requestBody:
+        description: > 
+          Idempotent method. Here is the data specific to a particular type of product.
+          A product is a type of specific product, such as a T-shirt, a sweatshirt, etc.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatingProduct'
+      responses:
+        201:
+          description: Representation of the created object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedProduct'
+        422:
+          description: Incorrect data sent.
+    get:
+      summary: Represents products.
+      tags:
+        - Product
+      responses:
+        200:
+          description: Returns all existing products.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreatedProduct'
+
+
+  /product/product/upload:
+    post:
+      summary: Product images loading.
+      description: >
+        Uploads images and links them to products by their ids.
+      tags:
+        - Product
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                sideA:
+                  type: string
+                  format: binary
+                sideB:
+                  type: string
+                  format: binary
+      responses:
+        201:
+          description: Images are uploaded successfully. Returns product object with specified image paths.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedInstance'
+        404:
+          description: Instance not found.
+        422:
+          description: Incorrect data send.
+
+
+  /product/product/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The product id
+        required: true
+        schema:
+          type: integer
+    delete:
+      tags:
+        - Product
+      summary: Deletes product.
+      description: >
+        Deletes product by id.
+      responses:
+        200:
+          description: Successful deleting.
+        404:
+          description: Instance not found.
+    put:
+      summary: Updates product instance.
+      tags:
+        - Product
+      description: >
+        This resource allows you to update existing product instance by one of or few its fields.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              anyOf:
+                - $ref: '#/components/schemas/CreatingProduct'
+      responses:
+        201:
+          description: Successfully updated product.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedProduct'
+        404:
+          description: Instance not found
+        422:
+          description: Incorrect data sent.
+
+
+  /product/size:
+    post:
+      summary: Size creating.
+      tags:
+        - Product
+      requestBody:
+        description: Idempotent method.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatingSize'
+      responses:
+        201:
+          description: Json representation of the created object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedSize'
+        422:
+          description: Incorrect data sent.
+    get:
+      summary: Represents all sizes.
+      tags:
+        - Product
+      responses:
+        200:
+          description: array of json objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreatedSize'
+
+
+  /product/size/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The size id
+        required: true
+        schema:
+          type: integer
+    delete:
+      tags:
+        - Product
+      summary: Deletes size.
+      description: >
+        Deletes size by id.
+      responses:
+        200:
+          description: Successful deleting.
+        404:
+          description: Instance not found.
+
+
+  /product/color:
+    post:
+      summary: Color creating.
+      tags:
+        - Product
+      requestBody:
+        description: Idempotent method.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatingColor'
+      responses:
+        201:
+          description: json representation of the created object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatedColor'
+        422:
+          description: Incorrect data sent.
+    get:
+      summary: Representation of all colors.
+      tags:
+        - Product
+      responses:
+        200:
+          description: array of json objects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreatedColor'
+
+
+  /product/color/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: The color id
+        required: true
+        schema:
+          type: integer
+    delete:
+      tags:
+        - Product
+      summary: Deletes color.
+      description: >
+        Deletes color by id.
+      responses:
+        200:
+          description: Successful deleting.
+        404:
+          description: Instance not found.
+
+
+
+components:
+  schemas:
+
+    BaseInstance:
+      type: object
+      properties:
+        article:
+          type: string
+          minLength: 9
+          maxLength: 9
+        stockBalance:
+          type: number
+          minimum: 0
+
+    CreatingWholeInstance:
+      allOf:
+        - $ref: '#/components/schemas/BaseInstance'
+      properties:
+        color:
+          $ref: '#/components/schemas/CreatingColor'
+        size:
+          $ref: '#/components/schemas/CreatingSize'
+        product:
+          $ref: '#/components/schemas/CreatingProduct'
+
+    CreatingInstance:
+      allOf:
+        - $ref: '#/components/schemas/BaseInstance'
+        - type: object
+          properties:
+            color_id:
+              type: integer
+            size_id:
+              type: integer
+            product_id:
+              type: integer
+
+    CreatedInstance:
+      allOf:
+        - $ref: '#/components/schemas/CreatingWholeInstance'
+        - type: object
+          properties:
+            id:
+              type: number
+            created_at:
+              type: integer
+            updated_at:
+              type: integer
+
+    CreatingColor:
+      type: object
+      properties:
+        name:
+          type: string
+          uniqueItems: true
+        value:
+          type: string
+
+    CreatedColor:
+      allOf:
+        - $ref: '#/components/schemas/CreatingColor'
+        - type: object
+          properties:
+            id:
+              type: integer
+
+    CreatingSize:
+      type: object
+      properties:
+        value:
+          type: string
+          uniqueItems: true
+
+    CreatedSize:
+      allOf:
+        - $ref: '#/components/schemas/CreatingSize'
+        - type: object
+          properties:
+            id:
+              type: integer
+
+    CreatingProduct:
+      type: object
+      properties:
+        name:
+          type: string
+          uniqueItems: true
+        description:
+          type: string
+          maxLength: 500
+        price:
+          type: number
+          minimum: 0
+        sex:
+          type: string
+          enum:
+            - uni
+            - male
+            - female
+
+    CreatedProduct:
+      allOf:
+        - $ref: '#/components/schemas/CreatingProduct'
+        - type: object
+          properties:
+            id:
+              type: number
+            path_to_a_side:
+              type: string
+              nullable: true
+            path_to_b_side:
+              type: string
+              nullable: true
+

@@ -4,9 +4,9 @@ namespace App\Common\Http\Controllers;
 
 trait Responses
 {
-    public function is404 (bool $result) {
+    public function is404 (mixed $result) {
         if ($result) {
-             return response('Success', 200);
+             return response($result, 200);
         }
          return response('Not found', 404);
     }

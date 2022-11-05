@@ -7,9 +7,12 @@ use App\Product\DTO\ColorDTO;
 use App\Product\DTO\PicsDTO;
 use App\Product\DTO\ProductDTO;
 use App\Product\DTO\ProductInstancePartialDTO;
+use App\Product\DTO\ProductInstanceUpdateDTO;
+use App\Product\DTO\ProductUpdateDTO;
 use App\Product\DTO\SizeDTO;
 use Illuminate\Http\Request;
 use App\Product\DTO\ProductInstanceWholeDTO;
+use Illuminate\Http\Response;
 use Spatie\LaravelData\DataCollection;
 
 
@@ -18,10 +21,12 @@ class ProductController extends Controller
 {
     public function __construct(private readonly ProductService $productService){}
 
-    public function createInstanceWhole(Request $req): array
+    /***************************************POST*************************************/
+
+    public function createInstanceWhole(Request $req): array | Response
     {
         if (!$req->file('sideA') || !$req->file('sideB')) {
-            return abort(422, 'Image must be specified');
+            return response('Image must be specified', 422);
         }
 
         /**
@@ -33,7 +38,6 @@ class ProductController extends Controller
         return $this->productService->createInstanceWhole($dto);
     }
 
-
     public function createInstancePartial (Request $req): ProductInstanceWholeDTO
     {
         return $this->productService->createInstancePartial(ProductInstancePartialDTO::from($req));
@@ -44,10 +48,10 @@ class ProductController extends Controller
         return $this->productService->createProduct(ProductDTO::from($req));
     }
 
-    public function loadProductPics (Request $req): ProductDTO
+    public function loadProductPics (Request $req): ProductDTO | Response
     {
         if (!$req->file('a_side') || !$req->file('b_side')) {
-            return abort(422, 'Image must be specified');
+            return response('Image must be specified', 422);
         }
 
         return $this->productService->loadPics(PicsDTO::from($req));
@@ -62,6 +66,21 @@ class ProductController extends Controller
     {
         return $this->productService->createSize(SizeDTO::from($req));
     }
+
+    /***********************************UPDATE***********************************/
+
+
+    public function updateInstance (Request $req) {
+        $result = $this->productService->updateInstance(ProductInstanceUpdateDTO::from($req), $req->route('id'));
+        return $this->is404($result);
+    }
+
+    public function updateProduct (Request $req) {
+        $result = $this->productService->updateProduct(ProductUpdateDTO::from($req), $req->route('id'));
+        return $this->is404($result);
+    }
+
+    /*********************************GET***************************************/
 
     public function getProducts (): DataCollection
     {
@@ -87,6 +106,9 @@ class ProductController extends Controller
     {
         return $this->productService->getInstance($req->route('id'));
     }
+
+
+    /*************************************DELETE********************************/
 
     public function deleteInstance(Request $req)
     {
