@@ -108,7 +108,7 @@ paths:
           description: Not found exception.
 
     put:
-      summary: Updates product instance.
+      summary: Updates product.
       tags:
         - Product
       description: >
@@ -185,7 +185,7 @@ paths:
 
   /product/product/upload:
     post:
-      summary: Product images loading.
+      summary: Product images uploading.
       description: >
         Uploads images and links them to products by their ids.
       tags:
@@ -384,7 +384,7 @@ components:
           type: string
           minLength: 9
           maxLength: 9
-        stockBalance:
+        stock_balance:
           type: number
           minimum: 0
 

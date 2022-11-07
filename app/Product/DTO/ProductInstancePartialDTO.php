@@ -2,14 +2,12 @@
 
 namespace App\Product\DTO;
 
-
-
 use App\Product\Models\Color;
 use App\Product\Models\Product;
 use App\Product\Models\ProductInstance;
 use App\Product\Models\Size;
 use Spatie\LaravelData\Attributes\Validation\Exists;
-use Spatie\LaravelData\Attributes\Validation\GreaterThan;
+use Spatie\LaravelData\Attributes\Validation\GreaterThanOrEqualTo;
 use Spatie\LaravelData\Attributes\Validation\Numeric;
 use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\Unique;
@@ -25,7 +23,7 @@ class ProductInstancePartialDTO extends Data
         public string $article,
 
         #[Numeric]
-        #[GreaterThan(0)]
+        #[GreaterThanOrEqualTo(0)]
         public int $stock_balance,
 
         public ?string $created_at,
